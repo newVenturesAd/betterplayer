@@ -38,6 +38,8 @@ class BetterPlayerDataSource {
   ///Optional cache configuration, used only for network data sources
   final BetterPlayerCacheConfiguration cacheConfiguration;
 
+  final String youtubeUrl;
+
   BetterPlayerDataSource(
     this.type,
     this.url, {
@@ -49,6 +51,7 @@ class BetterPlayerDataSource {
     this.hlsTrackNames,
     this.resolutions,
     this.cacheConfiguration,
+        this.youtubeUrl
   });
 
   BetterPlayerDataSource copyWith({
@@ -75,3 +78,4 @@ class BetterPlayerDataSource {
     );
   }
 }
+

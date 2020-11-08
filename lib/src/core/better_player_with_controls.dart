@@ -12,6 +12,7 @@ import 'package:better_player/src/subtitles/better_player_subtitles_configuratio
 import 'package:better_player/src/subtitles/better_player_subtitles_drawer.dart';
 import 'package:better_player/src/video_player/video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:extended_image/extended_image.dart';
 
 class BetterPlayerWithControls extends StatefulWidget {
   final BetterPlayerController controller;
@@ -31,7 +32,7 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
       widget.controller.betterPlayerConfiguration.controlsConfiguration;
 
   final StreamController<bool> playerVisibilityStreamController =
-      StreamController();
+  StreamController();
 
   @override
   void initState() {
@@ -60,12 +61,12 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
   @override
   Widget build(BuildContext context) {
     final BetterPlayerController betterPlayerController =
-        BetterPlayerController.of(context);
+    BetterPlayerController.of(context);
 
     var aspectRatio;
     if (betterPlayerController.isFullScreen) {
       aspectRatio = betterPlayerController
-              .betterPlayerConfiguration.fullScreenAspectRatio ??
+          .betterPlayerConfiguration.fullScreenAspectRatio ??
           BetterPlayerUtils.calculateAspectRatio(context);
     } else {
       aspectRatio =
@@ -78,6 +79,22 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.black,
+        decoration: BoxDecoration(
+            image: ExtendedImage.network(
+                betterPlayerController.betterPlayerDataSource.youtubeUrl,
+                retries: 3,
+                clearMemoryCacheIfFailed: true,
+                fit: Boxfit.cover,
+                loadStateChanged: (final ExtendedImageState state) {
+                  if (state.extendedImageLoadState == LoadState.completed) {
+                    return ExtendedRawImage(
+                      image: state.extendedImageInfo?.image,
+                    );
+                  }
+                  return Container();
+                }
+            )
+        ),
         child: AspectRatio(
           aspectRatio: aspectRatio,
           child: _buildPlayerWithControls(betterPlayerController, context),
@@ -120,22 +137,20 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
     );
   }
 
-  Widget _buildControls(
-    BuildContext context,
-    BetterPlayerController betterPlayerController,
-  ) {
+  Widget _buildControls(BuildContext context,
+      BetterPlayerController betterPlayerController,) {
     return controlsConfiguration.showControls
         ? controlsConfiguration.customControls != null
-            ? controlsConfiguration.customControls
-            : Platform.isAndroid
-                ? BetterPlayerMaterialControls(
-                    onControlsVisibilityChanged: onControlsVisibilityChanged,
-                    controlsConfiguration: controlsConfiguration,
-                  )
-                : BetterPlayerCupertinoControls(
-                    onControlsVisibilityChanged: onControlsVisibilityChanged,
-                    controlsConfiguration: controlsConfiguration,
-                  )
+        ? controlsConfiguration.customControls
+        : Platform.isAndroid
+        ? BetterPlayerMaterialControls(
+      onControlsVisibilityChanged: onControlsVisibilityChanged,
+      controlsConfiguration: controlsConfiguration,
+    )
+        : BetterPlayerCupertinoControls(
+      onControlsVisibilityChanged: onControlsVisibilityChanged,
+      controlsConfiguration: controlsConfiguration,
+    )
         : const SizedBox();
   }
 
@@ -146,11 +161,10 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
 
 ///Widget used to set the proper box fit of the video. Default fit is 'fill'.
 class _BetterPlayerVideoFitWidget extends StatefulWidget {
-  _BetterPlayerVideoFitWidget(
-    this.betterPlayerController,
-    this.boxFit,
-  )   : assert(betterPlayerController != null,
-            "BetterPlayerController can't be null"),
+  _BetterPlayerVideoFitWidget(this.betterPlayerController,
+      this.boxFit,)
+      : assert(betterPlayerController != null,
+  "BetterPlayerController can't be null"),
         assert(boxFit != null, "BoxFit can't be null");
 
   final BetterPlayerController betterPlayerController;
@@ -245,4 +259,5 @@ class _BetterPlayerVideoFitWidgetState
     super.dispose();
   }
 }
+
 
