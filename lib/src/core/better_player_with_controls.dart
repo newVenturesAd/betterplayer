@@ -76,6 +76,7 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
     return Center(
       child: Container(
         width: double.infinity,
+        height: double.infinity,
         color: Colors.black,
         child: AspectRatio(
           aspectRatio: aspectRatio,
@@ -244,3 +245,4 @@ class _BetterPlayerVideoFitWidgetState
     super.dispose();
   }
 }
+
