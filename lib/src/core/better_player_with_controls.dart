@@ -80,20 +80,11 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
         height: double.infinity,
         color: Colors.black,
         decoration: BoxDecoration(
-            image: ExtendedImage.network(
-                betterPlayerController.betterPlayerDataSource.youtubeUrl,
-                retries: 3,
-                clearMemoryCacheIfFailed: true,
-                fit: Boxfit.cover,
-                loadStateChanged: (final ExtendedImageState state) {
-                  if (state.extendedImageLoadState == LoadState.completed) {
-                    return ExtendedRawImage(
-                      image: state.extendedImageInfo?.image,
-                    );
-                  }
-                  return Container();
-                }
-            )
+            image: betterPlayerController.betterPlayerDataSource.youtubeUrl != null ? DecorationImage(
+              image: AssetImage(
+                  _getYoutubeImageUrl(betterPlayerController.betterPlayerDataSource.youtubeUrl)),
+              fit: BoxFit.cover,
+            ) : null,
         ),
         child: AspectRatio(
           aspectRatio: aspectRatio,
@@ -103,6 +94,15 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
     );
   }
 
+  String _getYoutubeImageUrl(final String youtubeUrl) {
+    List<String> splittedUrls = youtubeUrl.split('v=');
+
+    if(splittedUrls != null && splittedUrls.length == 2) {
+      final String imageUrl = "https://img.youtube.com/vi/" + splittedUrls.elementAt(1) +"/0.jpg";
+      return imageUrl;
+    }
+    return null;
+  }
   Container _buildPlayerWithControls(
       BetterPlayerController betterPlayerController, BuildContext context) {
     var configuration = betterPlayerController.betterPlayerConfiguration;
@@ -259,5 +259,6 @@ class _BetterPlayerVideoFitWidgetState
     super.dispose();
   }
 }
+
 
 
