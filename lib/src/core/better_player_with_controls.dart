@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
+import 'dart:ui' as ui;
 import 'package:better_player/better_player.dart';
 import 'package:better_player/src/controls/better_player_controls_configuration.dart';
 import 'package:better_player/src/controls/better_player_cupertino_controls.dart';
@@ -74,18 +74,12 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
               BetterPlayerUtils.calculateAspectRatio(context);
     }
 
+
     return Center(
       child: Container(
         width: double.infinity,
         height: double.infinity,
         color: Colors.black,
-        decoration: BoxDecoration(
-            image: betterPlayerController.betterPlayerDataSource.youtubeUrl != null ? DecorationImage(
-              image: AssetImage(
-                  _getYoutubeImageUrl(betterPlayerController.betterPlayerDataSource.youtubeUrl)),
-              fit: BoxFit.cover,
-            ) : null,
-        ),
         child: AspectRatio(
           aspectRatio: aspectRatio,
           child: _buildPlayerWithControls(betterPlayerController, context),
@@ -97,14 +91,34 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
   String _getYoutubeImageUrl(final String youtubeUrl) {
     List<String> splittedUrls = youtubeUrl.split('v=');
 
-    if(splittedUrls != null && splittedUrls.length == 2) {
-      final String imageUrl = "https://img.youtube.com/vi/" + splittedUrls.elementAt(1) +"/0.jpg";
+    if (splittedUrls != null && splittedUrls.length == 2) {
+      final String imageUrl = "https://img.youtube.com/vi/" +
+          splittedUrls.elementAt(1) + "/0.jpg";
+      return imageUrl;
+    }
+
+
+    splittedUrls = youtubeUrl.split('embed/');
+
+    if (splittedUrls != null && splittedUrls.length == 2) {
+      final String imageUrl = "https://img.youtube.com/vi/" +
+          splittedUrls.elementAt(1) + "/0.jpg";
       return imageUrl;
     }
     return null;
   }
+
+
   Container _buildPlayerWithControls(
       BetterPlayerController betterPlayerController, BuildContext context) {
+    var img;
+    try {
+      img = NetworkImage(_getYoutubeImageUrl(
+          betterPlayerController.betterPlayerDataSource.youtubeUrl));
+    } catch (e) {
+      //just ignore
+    }
+
     var configuration = betterPlayerController.betterPlayerConfiguration;
     var rotation = configuration.rotation;
 
@@ -116,6 +130,28 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
       child: Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
+          Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(
+                    sigmaX: 5.0,
+                    sigmaY: 5.0,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.0)),
+                  ),
+                ),
+              ),
+              decoration: img != null ? BoxDecoration(
+                image: DecorationImage(
+                  image: img,
+                  fit: BoxFit.cover,
+                ),
+
+              ) : null
+          ),
           betterPlayerController.placeholder ?? Container(),
           Transform.rotate(
             angle: rotation * pi / 180,

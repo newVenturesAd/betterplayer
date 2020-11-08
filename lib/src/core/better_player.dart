@@ -214,3 +214,4 @@ class BetterPlayerState extends State<BetterPlayer> {
     );
   }
 }
+
